@@ -1,0 +1,13 @@
+exportPattern("^[[:alpha:]]+")
+import("caret","magrittr","zoo")
+importFrom("grDevices", "dev.new")
+importFrom("graphics", "abline", "grid", "lines", "rug", "text")
+importFrom("utils", "data")
+importFrom("stats", "as.formula", "as.ts","complete.cases", "embed", "na.omit","predict", "start", "window","time","end")
+importFrom("caret","train")
+importFrom("magrittr","%>%")
+
+export("ttsCaret")
+export("iForecast")
+#export("")
+

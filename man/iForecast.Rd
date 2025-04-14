@@ -10,7 +10,7 @@ It generates both the static and recursive time series plots of machine learning
 }
 
 \usage{
-iForecast(Model,newdata,type)
+iForecast(Model,newdata,Type,n.ahead)
 }
 
 \arguments{
@@ -19,19 +19,21 @@ Object of trained model.
 }
 
 
-  \item{newdata}{The dataset for pediction, the column names must be the same as the trained data.
+  \item{newdata}{The dataset for pediction, the column names must be the same as the trained data.Not required if type="dynamic".
 
 }
 
-\item{type}{ If type="staticfit", it computes the direct (static) forecasting values of insample model fit; if type="recursive", it computes the recursive (dynamic) forecasting values of insample model; for recursive forecasts, AR term is required.
+\item{Type}{If Type="static", it computes the (static) forecasting values of insample model fit. If Type="dynamic", it recursively computes the forecasting values ahead.
 }
 
+\item{n.ahead}{For Type="dynamic", it is the number of forecasting periods ahead. Not required if type="static".
+}
 }
 
 
 \details{
 
-This function generates forecasts of ttsCaret,ttsAutoML, and ttsLSTM.
+This function generates forecasts of tts.caret,and tts.autoML.
 }
 
 
@@ -55,14 +57,15 @@ dep <- macrodata[569:669,"unrate",drop=FALSE]
 ind <- macrodata[569:669,-1,drop=FALSE]
 train.end <- "2018-12-01"# Choosing the end dating of train
 
-models <- c("svm","rf","rpart","gamboost","BstLm","bstSm","blackboost")[3]
+models <- c("svm","rf","rpart","gbm","nb")[1]
 type <- c("none","trend","season","both")[1]
-Caret <- ttsCaret(y=dep, x=ind, arOrder=c(1), xregOrder=c(1),
- method=models, tuneLength =1, train.end, type=type,
- trControl= trainControl(method = "cv"))
- testData1 <- window(Caret$data,start="2019-01-01",end=end(Caret$data))
-P1 <- iForecast(Model=Caret,newdata=testData1,type="staticfit")
-P2 <- iForecast(Model=Caret,newdata=testData1,type="recursive")
+# output <- tts.caret(y=dep, x=ind, arOrder=c(1), xregOrder=c(1),
+# method="smv", tuneLength =1,
+# train.end, type=type,resampling="cv",preProcess = "center")
+
+# testData1 <- window(output$dataused,start="2019-01-01",end=end(output$dataused))
+#P1=iForecast(Model=output,Type="static",newdata=testData1)
+#P2=iForecast(Model=output,Type="dynamic",n.ahead=7)
 
 #tail(cbind(testData1[,1],P1))
 #tail(cbind(testData1[,1],P2))
@@ -75,14 +78,14 @@ ind=bc[,-1]
 train.end=as.character(rownames(dep))[as.integer(nrow(dep)*0.8)]
 test.start=as.character(rownames(dep))[as.integer(nrow(dep)*0.8)+1]
 
-#Caret = ttsCaret(y=dep, x=ind, arOrder=c(1), xregOrder=c(1), method=models,
+#output = tts.caret(y=dep, x=ind, arOrder=c(1), xregOrder=c(1), method="nb",
 #                   tuneLength =10, train.end, type=type)
 
-#testData1=window(Caret$data,start=test.start,end=end(Caret$data))
+#testData1=window(output$dataused,start=test.start,end=end(output$dataused))
 
-#head(Caret$dataused)
-#P1=iForecast(Model=Caret,newdata=testData1,type="staticfit")
-#P2=iForecast(Model=Caret,newdata=testData1,type="recursive")
+#head(output$dataused)
+#P1=iForecast(Model=output,Type="static",newdata=testData1)
+#P2=iForecast(Model=output,Type="dynamic",n.ahead=7)
 
 #tail(cbind(testData1[,1],P1),10)
 #tail(cbind(testData1[,1],P2),10)

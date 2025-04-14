@@ -9,20 +9,19 @@
 It extracts time stamp from a timeSeries object and separates the time into in-sample training and out-of-sample validation ranges.
 }
 \usage{
-rollingWindows(x,estimation="18m",by = "6m")
+rollingWindows(x,estimation="18m",by = "1m")
 }
 
 \arguments{
 
-  \item{x}{ The time series matrix of dependent variable, with \code{timeSeries} or \code{zoo} format.
+  \item{x}{The time series object with \code{timeSeries}, \code{xts}, or \code{zoo} format of "%Y-%m-%d".
+  }
+
+  \item{estimation}{The range of insample estimation period, the default is 18 months(18m), where the k-fold cross-section is performed. Quarter, week and day are also supported (see example).
+
 }
 
-
-  \item{estimation}{The range of insample estimation period, the default is 18 months(18m), where the k-fold cross-section is performed.
-
-}
-
- \item{by}{The range of out-of-sample validation/testing period, the default is 6 months(6m).
+ \item{by}{The range of out-of-sample validation/testing period, the default is 6 months(6m).Quarter, week and day are also supported (see example).
 
 }
 
@@ -48,29 +47,33 @@ Ho Tsung-wu <tsungwu@ntnu.edu.tw>, College of Management, National Taiwan Normal
 
 \examples{
 data(macrodata)
-dep=macrodata[,1,drop=FALSE]
-ind=macrodata[,-1,drop=FALSE]
-
-timeframe=rollingWindows(dep,estimation="300m",by="6m")
+y=macrodata[,1,drop=FALSE]
+timeframe=rollingWindows(y,estimation="300m",by="6m")
+#estimation="300m", because macrodata is monthly
 FROM=timeframe$from
 TO=timeframe$to
 
-type=c("none","trend","season","both")[1]
-models=c("rf","rpart","svm","knn","nnet")[4]
-t0=1
-# you may change this to "for (to in 1: length(TO))" to perform rolling CV
-#output = ttsCaret(y=dep, x=ind, arOrder=c(1), xregOrder=c(1), method=models,
-#                   tuneLength =10, train.end=as.character(TO[t0]), type=type)
-#if(t0==length(TO)) {
-#  testData=window(output$dataused,start=TO[t0],end=end(Y))[-1,]
-#} else {testData=window(output$dataused,start=TO[t0],end=TO[t0+1])[-1,]}
+data(ES_Daily)
+y=ES_Daily[,1,drop=FALSE]
+timeframe=rollingWindows(y,estimation  ="60w",by="1w")
+#60 weeks(300+ days) as estimation window and move by 1 week(5+ days).
+
+FROM=timeframe$from
+TO=timeframe$to
+
+y=ES_Daily[,1,drop=FALSE]
+timeframe=rollingWindows(y,estimation  ="250d",by="10d")
+#250-day as estimation window and move by 10 days.
 
 
-#P1=iForecast(Model=output,newdata=testData,type="staticfit") # static forecasts generated
-#P2=iForecast(Model=output,newdata=testData,type="recursive") # dynamic forecasts generated
-
-#tail(cbind(testData[,1],P1),10)
-#tail(cbind(testData[,1],P2),10)
+# simulated quarterly data
+tmp0=ts(rnorm(800),start=c(1900,1),freq=4)
+tmp1=timeSeries::as.timeSeries(tmp0)
+tmp2=zoo::as.zoo(tmp0)
+tmp3=xts::as.xts(tmp0)
+timeframe=rollingWindows(x=tmp3,estimation ="100q",by="12q")
+FROM=timeframe$from
+TO=timeframe$to
 
 
 }

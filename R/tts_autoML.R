@@ -5,7 +5,8 @@ tts.autoML <-function(y,x=NULL,
                       type,
                       max_models = 20,
                       sort_metric="AUTO",
-                      stopping_metric = "AUTO") {
+                      stopping_metric = "AUTO",
+                      initial=TRUE) {
 
 
   dataset = .inputdata(y,x,arOrder,xregOrder,type)
@@ -23,15 +24,17 @@ tts.autoML <-function(y,x=NULL,
 
 }
 
+if (isTRUE(initial))  {
   h2o::h2o.init()        # Initialize h2o
   invisible(h2o::h2o.no_progress()) # Turn off progress bars
-  
+} else { print("Please execute h2o.init() before you run tts.autoML")}
+
   # Convert to H2OFrame objects
   train_h2o <- h2o::as.h2o(trainData)
 
   # Set names for h2o
   x <- setdiff(names(train_h2o), "y")
-  
+
   ##################################
   ###=== Estimation of autoML ===###
   ##################################
@@ -47,7 +50,7 @@ tts.autoML <-function(y,x=NULL,
   # Extract leader model
   output=autoML@leader
   modelsUsed=autoML@leaderboard
-  
+
   return(list(output=output,
               modelsUsed=modelsUsed,
               arOrder=arOrder,
@@ -55,6 +58,7 @@ tts.autoML <-function(y,x=NULL,
               data=DF0,
               TD=type,
               train.end=train.end))
+
 }
 
 

@@ -1,8 +1,8 @@
 Package: iForecast
 Type: Package
 Title: Machine Learning Time Series Forecasting
-Version: 1.1.1
-Date: 2025-04-01
+Version: 1.1.2
+Date: 2025-06-28
 Authors@R: person(given = "Ho",
                     family = "Tsung-wu",
                     role = c("aut", "cre"),
